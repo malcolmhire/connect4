@@ -1,7 +1,6 @@
 <?php namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use MalcolmHire\Connect4\Connect4;  
 
 class Connect4Play extends Command {
 
@@ -24,44 +23,45 @@ class Connect4Play extends Command {
     /**
      *  Default rows
      *
-     * @var int 
+     * @var int
      */
     protected $rows = 7;
 
     /**
      *  Default columns
      *
-     * @var int 
+     * @var int
      */
     protected $columns = 7;
 
     /**
      * Current player
-     * 
+     *
      * @var int
      */
     protected $current_player;
 
     /**
      * Counter positions array
-     * 
+     *
      * @var array
      */
     protected $board = [];
 
     /**
      * Track moves executed by both players.
-     * 
+     *
      * @var int
      */
     protected $moves = 0;
 
     /**
      * Class constructor
-     * 
+     *
+     * @return void
      */
     public function __construct()
-    {   
+    {
          parent::__construct();
     }
 
@@ -71,7 +71,7 @@ class Connect4Play extends Command {
      * @return void
      */
     public function fire()
-    {   
+    {
         // Setup game
         $this->setUpGame([
             'rows' => $this->argument('rows'),
@@ -82,6 +82,11 @@ class Connect4Play extends Command {
         $this->initGame();
     }
 
+    /**
+     * Setup game from config
+     *
+     * @return void
+     */
     protected function setUpGame($config)
     {
         // Set rows
@@ -91,38 +96,51 @@ class Connect4Play extends Command {
         $this->setColumns(isset($config['columns']) ? $config['columns'] : null);
     }
 
+    /**
+     * Initilise game
+     *
+     * @return void
+     */
     protected function initGame()
     {
         // Empty root array
         $board = [];
-        
+
         for ($i = 0; $i < $this->getRows(); $i++) {
             // Empty row array
             $board[$i] = [];
-            
-            for ($x = 0; $x < $this->getColumns(); $x++){
+
+            for ($x = 0; $x < $this->getColumns(); $x++) {
                 // Add column array
-                $board[$i][$x] = -1;
+                $board[$i][$x] = null;
             }
         }
-        
-        // Set board 
+
+        // Set board
         $this->setBoard($board);
 
         // Set player
         $this->setCurrentPlayer();
 
+        // Show instructions
+        $this->showInstructions();
+
         // Play Game
         $this->playGame($board);
     }
 
+    /**
+     * Play game recursive function
+     *
+     * @return void
+     */
     protected function playGame()
     {
         // Check if max turns
         if ($this->maximumTurnsCheck()) {
             // No winner then
-            $this->showWinnerMessage();
-            
+            $this->showNoWinnerMessage();
+
             // Exit script
             exit;
         }
@@ -141,52 +159,58 @@ class Connect4Play extends Command {
             // Display question
             $column = $this->ask('Pick a column to play')-1;
         }
-        
+
+        // Set board variable
         $board = $this->getBoard();
-        
+
         for ($row = $this->getRows()-1; $row >= 0; $row--) {
             // If slot is currently empty
-            if ($board[$row][$column] === -1) {
+            if ($board[$row][$column] === null) {
                 // Current player
                 $board[$row][$column] = $this->getCurrentPlayer();
-                
+
                 // Update moves
                 $this->moves++;
-                
+
                 // Update the board
                 $this->setBoard($board);
 
                 // Print board
-                $this->generateBoard();
-                
+                $this->createBoard();
+
                 // Check for winner
-                if ($this->_checkForWinner($row, $column)) {
+                if ($this->winnerCheck($row, $column)) {
                     // If winner is found
                     $this->showWinnerMessage();
-                    
+
                     // Exit script
                     exit;
-                    
+
                 } else {
                     // Change player
-                    $this->_togglePlayer();
-                    
+                    $this->changePlayer();
+
                     // Play again
                     $this->playGame();
                 }
-                
+
                 // Exit script
                 exit;
-            } 
-            
+            }
+
         }
-        
+
         // Redo move again
         $this->playGame();
     }
 
-    protected function generateBoard()
-    {   
+    /**
+     * Create connect4 board
+     *
+     * @return mixed
+     */
+    protected function createBoard()
+    {
         // Add empty line
         $this->line('');
 
@@ -206,28 +230,53 @@ class Connect4Play extends Command {
 
         // Get board
         $board = $this->getBoard();
-        
+
         // Loop through rows
         for ($row = 0; $row < $this->getRows(); $row++) {
             // Lopp though columns
             for ($column = 0; $column < $this->getColumns(); $column++) {
-                // Add color
+                // Add player color
                 if ($board[$row][$column] === 1) {
-                    echo "\033[31m|O|\033[0m "; 
+                    // Add player 1 column
+                    echo "\033[31m|O|\033[0m ";
                 } else if($board[$row][$column] === 2) {
+                    // Add player 2 column
                     echo "\033[34m|O|\033[0m ";
                 } else {
+                    // Add empty column
                     echo "\033[0m| |\033[0m ";
                 }
             }
-            
+
             // Add empty line
             $this->line('');
         }
     }
 
+    /**
+     * Print message to console with instructions
+     *
+     * @return string
+     */
+    protected function showInstructions()
+    {
+        // Add empty line
+        $this->line('');
+
+        // Shoe message
+        $this->info('Player 1 (You) - Red , Player 2 (Computer) - Blue');
+
+        // Add empty line
+        $this->line('');
+    }
+
+    /**
+     * Setter for number of rows
+     *
+     * @param $row [int]
+     */
     public function setRows($rows = null)
-    {   
+    {
         if (!$rows) {
             return;
         }
@@ -235,13 +284,23 @@ class Connect4Play extends Command {
         $this->rows = $rows;
     }
 
+    /**
+     * Getter to return rows
+     *
+     * @return [int]
+     */
     public function getRows()
     {
         return $this->rows;
     }
 
+    /**
+     * Setter for number of columns
+     *
+     * @param $columns [int]
+     */
     public function setColumns($columns = null)
-    {   
+    {
         if (!$columns) {
             return;
         }
@@ -249,23 +308,23 @@ class Connect4Play extends Command {
         $this->columns = $columns;
     }
 
+    /**
+     * Getter to return columns
+     *
+     * @return [int]
+     */
     public function getColumns()
     {
         return $this->columns;
     }
 
-    protected function setMoves($moves)
-    {      
-        $this->moves = $moves;
-    }
-
-    protected function getMoves()
-    {
-        return $this->moves;
-    }
-
+    /**
+     * Setter for current player
+     *
+     * @param $player [int]
+     */
     protected function setCurrentPlayer($player = null)
-    {   
+    {
         if (!$player) {
             // Randomise if no player set
             $player = rand(1,2);
@@ -274,33 +333,43 @@ class Connect4Play extends Command {
         return $this->current_player = $player;
     }
 
+    /**
+     * Getter to return current player
+     *
+     * @return [int]
+     */
     public function getCurrentPlayer()
     {
         return $this->current_player;
     }
 
     /**
-     * Gets the board
-     * 
+     * Getter to return board
+     *
      * @return array
      */
     protected function getBoard()
     {
-        return $this->board;    
-    }
-    
-    /**
-     * Sets the board 
-     */
-    protected function setBoard($board)
-    {
-        $this->board = $board;  
+        return $this->board;
     }
 
     /**
-     * Displays the message for the winner
+     * Sets the board
+     *
+     * @param $board [array]
      */
-    protected function showWinnerMessage(){
+    protected function setBoard($board)
+    {
+        $this->board = $board;
+    }
+
+    /**
+     * Winner message
+     *
+     * @return string
+     */
+    protected function showWinnerMessage()
+    {
         // Add empty line
         $this->line('');
 
@@ -310,11 +379,13 @@ class Connect4Play extends Command {
         // Add empty line
         $this->line('');
     }
-    
+
     /**
-     * Displays the message if there's no winner
+     * No winner message
+     *
+     * @return string
      */
-    protected function _showNoWinnerMessage(){
+    protected function showNoWinnerMessage(){
         // Add empty line
         $this->line('');
 
@@ -324,104 +395,98 @@ class Connect4Play extends Command {
         // Add empty line
         $this->line('');
     }
-    
+
     /**
-     * Switches the turn to the other player
+     * Change player
+     *
+     * @return void
      */
-    protected function _togglePlayer(){
-        
-        $this->setCurrentPlayer($this->getCurrentPlayer()===1?2:1);
-        
+    protected function changePlayer()
+    {
+        $this->setCurrentPlayer($this->getCurrentPlayer() === 1 ? 2 : 1);
     }
 
     /**
      * Check for winner
-     * 
+     *
      * @return boolean
      */
-    protected function _checkForWinner($row, $col)
+    protected function winnerCheck($row, $column)
     {
-        if ($this->horizontalCheck($row, $col) || $this->verticalCheck($row, $col)) {
+        if ($this->checkRow($row, $column) || $this->checkColumn($row, $column)) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
-     * Check for horizontal pieces
-     * 
+     * Check row for discs
+     *
      * @return boolean
      */
-    private function horizontalCheck( $row, $col )
+    private function checkRow($row, $column)
     {
-        
-        $_board_array = $this->getBoard();
-        $_player = $_board_array[$row][$col];
-        $_count = 0;
-        
-        //count towards the left of current piece
-        for ( $i = $col; $i>=0; $i-- )
-        {
-            
-            if( $_board_array[$row][$i] !== $_player ){
-                
+        // Get board
+        $board = $this->getBoard();
+
+        // Get cell player
+        $player = $board[$row][$column];
+
+        // Init counter
+        $count = 0;
+
+        // Check backward
+        for ($i = $column; $i >= 0; $i--) {
+
+            if ($board[$row][$i] !== $player){
                 break;
-                
             }
-            
-            $_count++;
-            
+
+            $count++;
         }
-        
-        //count towards the right of current piece
-        for ( $i = $col + 1; $i<$this->getColumns(); $i++ )
-        {
-                
-            if( $_board_array[$row][$i] !== $_player ){
-        
+
+        // Check forward
+        for ($i = $column + 1; $i < $this->getColumns(); $i++) {
+
+            if ($board[$row][$i] !== $player) {
                 break;
-        
             }
-                
-            $_count++;
-                
+
+            $count++;
         }
-        
-        return $_count>=4 ? true : false;
-        
+
+        return $count >= 4 ? true : false;
     }
-    
+
     /**
-     * Check for vertical pieces
-     * 
+     * Check column for discs
+     *
      * @return boolean
      */
-    private function verticalCheck($row, $col)
+    private function checkColumn($row, $column)
     {
-    
-        //if current piece is less than 4 pieces from bottom, skip check
-        if ( $row >= $this->getRows()-3 ) {
-            
+        // Less than 4 pieces from bottom
+        if ($row >= $this->getRows()-3) {
             return false;
-            
         }
-        
-        $_board_array = $this->getBoard();
-        $_player = $_board_array[$row][$col];
-        
-        for ( $i = $row + 1; $i <= $row + 3; $i++ ){
-            
-            if($_board_array[$i][$col] !== $_player){
-                
-                return false;   
-                
+
+        // Get board
+        $board = $this->getBoard();
+
+        // Get cell player
+        $player = $board[$row][$column];
+
+        // Check forward
+        for ($i = $row + 1; $i <= $row + 3; $i++) {
+
+            if ($board[$i][$column] !== $player) {
+                return false;
             }
-            
+
         }
-        
+
         return true;
-        
     }
 
     /**
