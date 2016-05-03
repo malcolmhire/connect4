@@ -102,12 +102,15 @@ class Connect4Play extends Command {
             
             for ($x = 0; $x < $this->getColumns(); $x++){
                 // Add column array
-                $board[$i][$x] = null;
+                $board[$i][$x] = -1;
             }
         }
         
         // Set board 
         $this->setBoard($board);
+
+        // Set player
+        $this->setCurrentPlayer();
 
         // Play Game
         $this->playGame($board);
@@ -136,45 +139,43 @@ class Connect4Play extends Command {
         // If human player ask what column
         if ($this->getCurrentPlayer() === 1) {
             // Display question
-            $column = $this->choice('Pick a column to play', range(1, $this->getColumns()))-1;
+            $column = $this->ask('Pick a column to play')-1;
         }
         
-        $_current_board = $this->getBoard();
+        $board = $this->getBoard();
         
-        for( $row = $this->getRows()-1; $row>=0; $row-- ){
-
-            //If slot is currently empty
-            if( $_current_board[$row][$column] === null ){
-                
-                //Set slot to current player
-                $_current_board[$row][$column] = $this->getCurrentPlayer();
+        for ($row = $this->getRows()-1; $row >= 0; $row--) {
+            // If slot is currently empty
+            if ($board[$row][$column] === -1) {
+                // Current player
+                $board[$row][$column] = $this->getCurrentPlayer();
                 
                 // Update moves
-                $this->setMoves();
+                $this->moves++;
                 
                 // Update the board
-                $this->setBoard($_current_board);
-                
-                //Print current board
+                $this->setBoard($board);
+
+                // Print board
                 $this->generateBoard();
                 
-                //Check for winner
-                if ( $this->_checkForWinner( $row, $column ) ) {
-                    
+                // Check for winner
+                if ($this->_checkForWinner($row, $column)) {
                     // If winner is found
                     $this->showWinnerMessage();
                     
+                    // Exit script
                     exit;
                     
                 } else {
-                    //Change player
+                    // Change player
                     $this->_togglePlayer();
                     
-                    //Drop the piece
-                    $this->playTurn();
+                    // Play again
+                    $this->playGame();
                 }
                 
-                //exit once a piece is dropped for this move
+                // Exit script
                 exit;
             } 
             
@@ -196,21 +197,24 @@ class Connect4Play extends Command {
         $this->line('');
 
         // Print column headings
-        for ($i = 0; $i < $this->getRows(); $i ++ ) {
+        for ($i = 0; $i < $this->getRows(); $i ++) {
             echo "\033[33m[".($i+1)."] \033[0m";
         }
 
         // Add empty line
         $this->line('');
 
-        $_board_array = $this->getBoard();
-      
-        for ($i = 0; $i < 7; $i++ ){
-            
-            for ($j = 0; $j < 7; $j++ ){
-                if ( $_board_array[$i][$j] === 1 ){
+        // Get board
+        $board = $this->getBoard();
+        
+        // Loop through rows
+        for ($row = 0; $row < $this->getRows(); $row++) {
+            // Lopp though columns
+            for ($column = 0; $column < $this->getColumns(); $column++) {
+                // Add color
+                if ($board[$row][$column] === 1) {
                     echo "\033[31m|O|\033[0m "; 
-                } else if( $_board_array[$i][$j] === 2 ){
+                } else if($board[$row][$column] === 2) {
                     echo "\033[34m|O|\033[0m ";
                 } else {
                     echo "\033[0m| |\033[0m ";
@@ -250,9 +254,9 @@ class Connect4Play extends Command {
         return $this->columns;
     }
 
-    protected function setMoves()
-    {   
-        $this->moves = $this->moves++;
+    protected function setMoves($moves)
+    {      
+        $this->moves = $moves;
     }
 
     protected function getMoves()
@@ -427,7 +431,7 @@ class Connect4Play extends Command {
      */
     protected function maximumTurnsCheck()
     {
-        if ($this->getMoves() >= ($this->getRows() * $this->getColumns())) {
+        if ($this->moves >= ($this->getRows() * $this->getColumns())) {
             return true;
         }
 
