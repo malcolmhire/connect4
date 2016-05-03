@@ -15,7 +15,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "MalcolmHire\\Connect4\\": "packages/malcolmhire/connect4/src"
         }
     },
     "autoload-dev": {
