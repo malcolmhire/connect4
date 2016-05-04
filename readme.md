@@ -32,4 +32,5 @@ The main package is located in packages/MalcolmHire/Connect4/Console/Connect4Com
 I have utilised a `Illuminate\Console\Command` to easily work with CLI and used Laravel Lumen for the use of Artisan to run commands in CLI.
 
 All code should be to a PSR-4 standard
-Tests, there are no test currently in place, if this was a production app I would write a few tests to go with the app.
+
+There are no tests currently in place, if this was a production app I would write a few tests to go with the app.
