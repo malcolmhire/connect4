@@ -58,7 +58,7 @@ class Connect4Command extends Command {
     protected $moves = 0;
 
     /**
-     * Class constructor
+     * Create new command instance
      *
      * @return void
      */

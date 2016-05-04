@@ -17,7 +17,7 @@ class Connect4ServiceProvider extends ServiceProvider {
     }
 
     /**
-    * Register the application services.
+    * Register service provider.
     *
     * @return void
     */
@@ -26,6 +26,11 @@ class Connect4ServiceProvider extends ServiceProvider {
         $this->registerCommands();
     }
 
+    /**
+     * Register commands.
+     *
+     * @return void
+     */
     public function registerCommands()
     {
         $this->registerConnect4Command();
@@ -35,6 +40,11 @@ class Connect4ServiceProvider extends ServiceProvider {
         );
     }
 
+    /**
+     * Register connect4:play command.
+     *
+     * @return void
+     */
     public function registerConnect4Command()
     {
         $this->app['connect4::commands.play'] = $this->app->share(function($app)
