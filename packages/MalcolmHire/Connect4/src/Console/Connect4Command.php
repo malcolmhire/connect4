@@ -1,8 +1,10 @@
-<?php namespace App\Console\Commands;
+<?php namespace MalcolmHire\Connect4\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
-class Connect4Play extends Command {
+class Connect4Command extends Command {
 
     /**
      * The console command name.
@@ -56,7 +58,7 @@ class Connect4Play extends Command {
     protected $moves = 0;
 
     /**
-     * Class constructor
+     * Create new command instance
      *
      * @return void
      */
