@@ -81,7 +81,8 @@ $app->singleton(
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
-$app->register('App\Providers\CommandServiceProvider');
+// $app->register('App\Providers\CommandServiceProvider');
+$app->register('MalcolmHire\Connect4\Connect4ServiceProvider');
 
 /*
 |--------------------------------------------------------------------------

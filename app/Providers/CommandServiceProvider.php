@@ -13,13 +13,6 @@ class CommandServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('command.connect4.command', function()
-        {
-            return new Connect4Play;
-        });
-
-        $this->commands(
-            'command.connect4.command'
-        );
+        //
     }
 }

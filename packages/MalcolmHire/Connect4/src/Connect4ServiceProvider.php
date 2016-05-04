@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace MalcolmHire\Connect4;
 
@@ -31,7 +31,7 @@ class Connect4ServiceProvider extends ServiceProvider {
         $this->registerConnect4Command();
 
         $this->commands(
-            'connect4::commands.play',
+            'connect4::commands.play'
         );
     }
 
