@@ -1,6 +1,6 @@
 # Connect4
 
-A a PHP CLI connect4 game, where a human can play the computer with simple AI.
+A PHP CLI connect4 game, where a human can play the computer with simple AI.
 Game is build on Lumen framework just for minimal installation and use of artisan.
 
 ## Lumen PHP Framework
@@ -28,6 +28,8 @@ To play game in command line run
 ## Code Review
 
 The main package is located in packages/MalcolmHire/Connect4/Console/Connect4Command.php, this could be abstracted into a composer package but I have left in place for easy review.
-I have utilised a `Illuminate\Console\Command` to easily work with CLI and used Laravel Lumen for the use of Artisan to run commands in he CLI.
+
+I have utilised a `Illuminate\Console\Command` to easily work with CLI and used Laravel Lumen for the use of Artisan to run commands in CLI.
+
 All code should be to a PSR-4 standard
 Tests, there are no test currently in place, if this was a production app I would write a few tests to go with the app.
